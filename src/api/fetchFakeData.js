@@ -13,7 +13,7 @@
  */
 const fetchFakeData = centerCoordinates => {
   const newFeaturesList = [];
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 10; i++) {
     const id = i;
     const { longitude, latitude } = getRandomCoordinate(centerCoordinates);
     newFeaturesList.push({
@@ -24,7 +24,7 @@ const fetchFakeData = centerCoordinates => {
       },
       properties: {
         id,
-        name: `Random Point #${id}`,
+        title: `Random Point #${id}`,
         description: `description for Random Point #${id}`
       }
     });
@@ -42,8 +42,8 @@ const fetchFakeData = centerCoordinates => {
  * @return {CoordinatePair} randomly generated coordinate pair
  */
 const getRandomCoordinate = ({ longitude: centerLon, latitude: centerLat }) => {
-  const r = 0.025 * Math.sqrt(Math.random());
-  const theta = Math.random() * 2 * Math.PI;
+  const r = 10 * Math.sqrt(Math.random());
+  const theta = Math.random() * 2 * Math.pow(Math.PI, 6);
   const latitude = centerLat + r * Math.cos(theta);
   const longitude = centerLon + r * Math.sin(theta);
   return { longitude, latitude };

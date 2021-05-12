@@ -6,7 +6,7 @@ import fetchFakeData from "./api/fetchFakeData";
 import Popup from "./components/Popup";
 import "./App.css";
 
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+mapboxgl.accessToken = 'pk.eyJ1Ijoibml0aGlua25qYWluIiwiYSI6ImNrb2xjaDlnZTA0NmUyb3F0NWZjZnp0ZzYifQ.TGtgvNrOO3DnuNwmdXeWvA';
 
 const App = () => {
   const mapContainerRef = useRef(null);
@@ -18,14 +18,15 @@ const App = () => {
       container: mapContainerRef.current,
       // See style options here: https://docs.mapbox.com/api/maps/#styles
       style: "mapbox://styles/mapbox/streets-v11",
-      center: [-104.9876, 39.7405],
-      zoom: 12.5
+      center: [134.0711, -27.0491],
+      zoom: 3.3
     });
+    
 
     // add navigation control (zoom buttons)
     map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
 
-    map.on("load", () => {
+    map.on("load", async () => {
       // add the data source for new a feature collection with no features
       map.addSource("random-points-data", {
         type: "geojson",
@@ -34,25 +35,28 @@ const App = () => {
           features: []
         }
       });
-      // now add the layer, and reference the data source above by name
-      map.addLayer({
-        id: "random-points-layer",
-        source: "random-points-data",
-        type: "symbol",
-        layout: {
-          // full list of icons here: https://labs.mapbox.com/maki-icons
-          "icon-image": "bakery-15", // this will put little croissants on our map
-          "icon-padding": 0,
-          "icon-allow-overlap": true
-        }
-      });
-    });
-
-    map.on("moveend", async () => {
       // get new center coordinates
       const { lng, lat } = map.getCenter();
       // fetch new data
       const results = await fetchFakeData({ longitude: lng, latitude: lat });
+      results.features.forEach(function(marker) {
+
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'marker';
+
+        // make a marker for each feature and add to the map
+        new mapboxgl.Marker(el)
+          .setLngLat(marker.geometry.coordinates)
+          .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+          .setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
+          .addTo(map);
+    });
+
+    map.on("moveend", async () => {
+      
+      });
+      
       // update "random-points-data" source with new data
       // all layers that consume the "random-points-data" data source will be updated automatically
       map.getSource("random-points-data").setData(results);
